@@ -64,12 +64,37 @@ def multi(Path):
     #3: number of iterations files
     filenames_3 = ["/pIters_0", "/pIters_1", "/UxIters_0", "/UyIters_0", "/UzIters_0", "/kIters_0", "/epsilonIters_0"]
 
-    #!!! need a way to combine path to filenames.
+    #!!! need a better way to combine path to filenames.
+    filepath_1 = []
+    # obtain legend names from file names
+    for string in filenames_1:
+        # desired name in legend
+        new_string = Path[0] + string
+        #add (to end) of legend
+        filepath_1.append(new_string)
+    
+    filepath_2 = []
+    # obtain legend names from file names
+    for string in filenames_2:
+        # desired name in legend
+        new_string = Path[0] + string
+        #add (to end) of legend
+        filepath_2.append(new_string)
+    
+    filepath_3 = []
+    # obtain legend names from file names
+    for string in filenames_3:
+        # desired name in legend
+        new_string = Path[0] + string
+        #add (to end) of legend
+        filepath_3.append(new_string)
 
-    #read amnd generate dataframe from txt files:
-    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_1]
-    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_2]
-    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_3]
+
+
+    #read and generate dataframe from txt files:
+    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_1]
+    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_2]
+    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_3]
 
     # Combine the dataframes
     initial_combined = pd.concat(initial_tolerance_df, ignore_index=False, axis=1)
