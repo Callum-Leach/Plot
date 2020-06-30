@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import sys
 from subprocess import call
+import shlex
+import os
 
 #Main menu function
 def menu():
@@ -13,18 +15,18 @@ def menu():
     print()
 
     choice = input("""
-                      1: Multi Sim
-                      2: Simulation
-                      3: Process Files
-                      4: Unprocess Files
-                      5: Quit/Log Out
+    1: Multi Sim
+    2: Simulation
+    3: Process Files
+    4: Unprocess Files
+    5: Quit/Log Out
 
-                      Please enter your choice: """)
+    Please enter your choice: """)
 
     if choice == "1":
-        multi()
+        multi(path())
     elif choice == "2":
-        sim()
+        sim(path())
     elif choice == "3":
         print("Processing Files")
         call("./process.sh")
@@ -38,15 +40,31 @@ def menu():
         print("Please try again")
         menu()
 
-def multi():
+def path():
+    fileList = []
+    while True:
+        filePaths = input('Enter files to save. Enter "Done" to end.-->')
+        if filePaths.lower() == "done":
+            break
+        for filePath in shlex.split(filePaths):
+            if not os.path.exists(filePath):
+                print("'{}' not found".format(filePath))
+            else:
+                fileList.append(filePath)
+    return fileList
+
+def multi(Path):
+
     #1: initial tolerance files
-    filenames_1 = ["Processed/Simulation1/logs/p_0", "Processed/Simulation1/logs/p_1", "Processed/Simulation1/logs/Ux_0", "Processed/Simulation1/logs/Uy_0", "Processed/Simulation1/logs/Uz_0", "Processed/Simulation1/logs/k_0", "Processed/Simulation1/logs/epsilon_0"]
+    filenames_1 = ["/p_0", "/p_1", "/Ux_0", "/Uy_0", "/Uz_0", "/k_0", "/epsilon_0"]
 
     #2: final tolerance files
-    filenames_2 = ["Processed/Simulation1/logs/pFinalRes_0", "Processed/Simulation1/logs/pFinalRes_1", "Processed/Simulation1/logs/UxFinalRes_0", "Processed/Simulation1/logs/UyFinalRes_0", "Processed/Simulation1/logs/UzFinalRes_0", "Processed/Simulation1/logs/kFinalRes_0", "Processed/Simulation1/logs/epsilonFinalRes_0"]
+    filenames_2 = ["/pFinalRes_0", "/pFinalRes_1", "/UxFinalRes_0", "/UyFinalRes_0", "/UzFinalRes_0", "/kFinalRes_0", "/epsilonFinalRes_0"]
 
     #3: number of iterations files
-    filenames_3 = ["Processed/Simulation1/logs/pIters_0", "Processed/Simulation1/logs/pIters_1", "Processed/Simulation1/logs/UxIters_0", "Processed/Simulation1/logs/UyIters_0", "Processed/Simulation1/logs/UzIters_0", "Processed/Simulation1/logs/kIters_0", "Processed/Simulation1/logs/epsilonIters_0"]
+    filenames_3 = ["/pIters_0", "/pIters_1", "/UxIters_0", "/UyIters_0", "/UzIters_0", "/kIters_0", "/epsilonIters_0"]
+
+    #!!! need a way to combine path to filenames.
 
     #read amnd generate dataframe from txt files:
     initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_1]
@@ -169,7 +187,7 @@ def multi():
     # display plot until closed
     plt.show()
 
-def sim():
+def sim(passed_list):
     #1: Simulation1 initial tolerance
     filenames_1 = ["Processed/Simulation1/logs/p_0", "Processed/Simulation1/logs/p_1", "Processed/Simulation1/logs/Ux_0", "Processed/Simulation1/logs/Uy_0", "Processed/Simulation1/logs/Uz_0", "Processed/Simulation1/logs/k_0", "Processed/Simulation1/logs/epsilon_0"]
 
