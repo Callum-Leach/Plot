@@ -6,51 +6,17 @@ import pandas as pd
 
 #!!!Change these file names to suit variable!!!#
 
-#Simulation 1
 #1: initial tolerance files
-filenames_1_1 = ["Processed/Simulation1/logs/p_0"]
+filenames_1 = ["Processed/Simulation1/logs/p_0", "Processed/Simulation2/logs/p_0", "Processed/Simulation3/logs/p_0", "Processed/Simulation4/logs/p_0", "Processed/Simulation5/logs/p_0"]
 #2: final tolerance files
-filenames_1_2 = ["Processed/Simulation1/logs/pFinalRes_0"]
+filenames_2 = ["Processed/Simulation1/logs/pFinalRes_0", "Processed/Simulation2/logs/pFinalRes_0", "Processed/Simulation3/logs/p_0", "Processed/Simulation4/logs/pFinalRes_0", "Processed/Simulation5/logs/pFinalRes_0"]
 #3: number of iterations files
-filenames_1_3 = ["Processed/Simulation1/logs/pIters_0"]
-
-'''Simulation 2
-#1: initial tolerance files
-filenames_2_1 = ["Processed/Simulation2/logs/p_0"]
-#2: final tolerance files
-filenames_2_2 = ["Processed/Simulation2/logs/pFinalRes_0"]
-#3: number of iterations files
-filenames_2_3 = ["Processed/Simulation2/logs/pIters_0"]
-
-#Simulation 3
-#1: initial tolerance files
-filenames_3_1 = ["Processed/Simulation3/logs/p_0"]
-#2: final tolerance files
-filenames_3_2 = ["Processed/Simulation3/logs/pFinalRes_0"]
-#3: number of iterations files
-filenames_3_3 = ["Processed/Simulation3/logs/pIters_0"]
-
-#Simulation 4
-#1: initial tolerance files
-filenames_4_1 = ["Processed/Simulation4/logs/p_0"]
-#2: final tolerance files
-filenames_4_2 = ["Processed/Simulation4/logs/pFinalRes_0"]
-#3: number of iterations files
-filenames_4_3 = ["Processed/Simulation4/logs/pIters_0"]
-
-#Simulation 5
-#1: initial tolerance files
-filenames_5_1 = ["Processed/Simulation5/logs/p_0"]
-#2: final tolerance files
-filenames_5_2 = ["Processed/Simulation5/logs/pFinalRes_0"]
-#3: number of iterations files
-filenames_5_3 = ["Processed/Simulation5/logs/pIters_0"]
-'''
+filenames_3 = ["Processed/Simulation1/logs/pIters_0", "Processed/Simulation2/logs/pIters_0", "Processed/Simulation3/logs/pIters_0", "Processed/Simulation4/logs/pIters_0", "Processed/Simulation5/logs/pIters_0"]
 
 #read and generate dataframe from txt files:
-initial_tolerance_df = [pd.read_csv(filenames_1_1, sep="\t", engine='python')]
-final_tolerance_df = [pd.read_csv(filenames_1_2, sep="\t", engine='python')]
-num_iterations_df = [pd.read_csv(filenames_1_3, sep="\t", engine='python')]
+initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_1]
+final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_2]
+num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_3]
 
 # Combine the dataframes
 initial_combined = pd.concat(initial_tolerance_df, ignore_index=False, axis=1)
