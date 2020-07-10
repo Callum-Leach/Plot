@@ -162,6 +162,7 @@ ax[1, 1].set_xlim(1, len(relative_combined_4))
 # add legend to the plot
 ax[1, 1].legend(legend_1)
 
+
 # force plot to display in full-screen
 manager = plt.get_current_fig_manager()
 manager.resize(*manager.window.maxsize())
