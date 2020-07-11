@@ -41,60 +41,57 @@ def menu():
         menu()
 
 def path():
-    fileList = []
-    while True:
-        filePaths = input('Enter files to save. Enter "Done" to end.-->')
-        if filePaths.lower() == "done":
-            break
-        for filePath in shlex.split(filePaths):
-            if not os.path.exists(filePath):
-                print("'{}' not found".format(filePath))
-            else:
-                fileList.append(filePath)
-    return fileList
+    filepathlist = []
+    for subdir, dirs, files in os.walk(r'Processed/'):
+        files.sort()
+        for filename in files:
+            filepath = subdir + os.sep + filename
+            filepathlist.append(filepath)
+    
+    return filepathlist
 
-def multi(Path):
+    
+
+def multi(filepathlist):
 
     #1: initial tolerance files
-    filenames_1 = ["/p_0", "/p_1", "/Ux_0", "/Uy_0", "/Uz_0", "/k_0", "/epsilon_0"]
+    filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
 
     #2: final tolerance files
-    filenames_2 = ["/pFinalRes_0", "/pFinalRes_1", "/UxFinalRes_0", "/UyFinalRes_0", "/UzFinalRes_0", "/kFinalRes_0", "/epsilonFinalRes_0"]
+    filenames_2 = ["pFinalRes_0", "pFinalRes_1", "UxFinalRes_0", "UyFinalRes_0", "UzFinalRes_0", "kFinalRes_0", "epsilonFinalRes_0"]
 
     #3: number of iterations files
-    filenames_3 = ["/pIters_0", "/pIters_1", "/UxIters_0", "/UyIters_0", "/UzIters_0", "/kIters_0", "/epsilonIters_0"]
-
-    #!!! need a better way to combine path to filenames.
-    filepath_1 = []
-    # obtain legend names from file names
-    for string in filenames_1:
-        # desired name in legend
-        new_string = Path[0] + string
-        #add (to end) of legend
-        filepath_1.append(new_string)
+    filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
     
-    filepath_2 = []
-    # obtain legend names from file names
-    for string in filenames_2:
-        # desired name in legend
-        new_string = Path[0] + string
-        #add (to end) of legend
-        filepath_2.append(new_string)
+    #Initialise lists for simulation files
+    sim1_path = []
+
+    #Initialise data segments.
+    initial_path = []
+    final_path = []
+    niterations_path = []
+
+    #Maybe take user input specifying which simulation you want to graph.
+
+    #Seperate the simulations
+    for i in filepathlist:
+        if i.find("Simulation1") != -1:
+            sim1_path.append(i)
+
+    #Split the simulation data into initial tolerance, final, n.o interations.
+    for i in sim1_path:
+        for x, y, z in zip(filenames_1, filenames_2, filenames_3):
+            if i.find(x) != -1:
+                initial_path.append(i)
+            elif i.find(y) != -1:
+                final_path.append(i)
+            elif i.find(z) != -1:
+                niterations_path.append(i)
     
-    filepath_3 = []
-    # obtain legend names from file names
-    for string in filenames_3:
-        # desired name in legend
-        new_string = Path[0] + string
-        #add (to end) of legend
-        filepath_3.append(new_string)
-
-
-
     #read and generate dataframe from txt files:
-    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_1]
-    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_2]
-    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filepath_3]
+    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in initial_path]
+    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in final_path]
+    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in niterations_path]
 
     # Combine the dataframes
     initial_combined = pd.concat(initial_tolerance_df, ignore_index=False, axis=1)
@@ -132,14 +129,7 @@ def multi(Path):
     # (optional) add horizontal lines to plot for idea of residuals relaxations.
     ax[0, 0].axhline(y=1.0e-05, color="black", linestyle='--')
     ax[0, 0].axhline(y=1.0e-04, color="black", linestyle='-')
-    # instantaiate array for legend names
-    legend_1 = []
-    # obtain legend names from file names
-    for string in filenames_1:
-        # desired name in legend
-        new_string = string.replace("Processed/Simulation1/logs/", "")
-        #add (to end) of legend
-        legend_1.append(new_string)
+
     # title of plot
     ax[0, 0].set_title("Residual vs. Iteration")
     # x axis label
@@ -153,7 +143,7 @@ def multi(Path):
     ax[0, 0].set_xlim(1, len(initial_combined))
 
     # add legend to the plot
-    ax[0, 0].legend(legend_1)
+    ax[0, 0].legend(filenames_1)
 
 
     # plot 2 - relative tol time series
@@ -170,7 +160,7 @@ def multi(Path):
     ax[0, 1].set_xlim(1, len(relative_combined))
 
     # add legend to the plot
-    ax[0, 1].legend(legend_1)
+    ax[0, 1].legend(filenames_1)
 
 
     # plot 3 - number iterations at each timestep time series
@@ -188,7 +178,7 @@ def multi(Path):
 
 
     # add legend to the plot
-    ax[1, 0].legend(legend_1)
+    ax[1, 0].legend(filenames_1)
 
     # plot 4 - % change in initial to final tolerance time series.
 
@@ -202,7 +192,7 @@ def multi(Path):
     ax[1, 1].set_xlim(1, len(percentage_combined))
 
     # add legend to the plot
-    ax[1, 1].legend(legend_1)
+    ax[1, 1].legend(filenames_1)
 
 
     # force plot to display in full-screen

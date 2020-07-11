@@ -79,7 +79,7 @@ for i in range(0, len(initial_tolerance_df_4)):
 
 # define a figure, with subplots as an array "ax" 
 fig, ax = plt.subplots(2,2)
-
+fig.suptitle("Relative Tolerances vs. Iteration")
 
 #Generate plots:
 ax[0, 0].plot(relative_combined_1)
@@ -100,7 +100,7 @@ for string in filenames_1_i:
 # plot 1 - relative tol time series Simulation 1
 
 # title of plot
-ax[0, 0].set_title("Relative Tolerances vs. Iteration\nSimulation 1")
+ax[0, 0].set_title("Simulation 1")
 # x axis label
 ax[0, 0].set_xlabel("Iteration")
 # y axis label
@@ -117,7 +117,7 @@ ax[0, 0].legend(legend_1)
 # plot 2 - relative tol time series Simulation 2
 
 # title of plot
-ax[0, 1].set_title("Relative Tolerances vs. Iteration\nSimulation 2")
+ax[0, 1].set_title("Simulation 2")
 # x axis label
 ax[0, 1].set_xlabel("Iteration")
 # y axis label
@@ -133,7 +133,7 @@ ax[0, 1].legend(legend_1)
 # plot 3 - relative tol time series Simulation 3
 
 # title of plot
-ax[1, 0].set_title("Relative Tolerances vs. Iteration\nSimulation 3")
+ax[1, 0].set_title("Simulation 3")
 # x axis label
 ax[1, 0].set_xlabel("Iteration")
 # y axis label
@@ -149,7 +149,7 @@ ax[1, 0].legend(legend_1)
 # plot 4 - relative tol time series Simulation 4
 
 # title of plot
-ax[1, 1].set_title("Relative Tolerances vs. Iteration\nSimulation 4")
+ax[1, 1].set_title("Simulation 4")
 # x axis label
 ax[1, 1].set_xlabel("Iteration")
 # y axis label
