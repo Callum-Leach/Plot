@@ -15,8 +15,8 @@ def menu():
     print()
 
     choice = input("""
-    1: Multi Sim
-    2: Simulation
+    1: Individual Simulation Plots
+    2: Initial Tolerance vs Simulations
     3: Process Files
     4: Unprocess Files
     5: Quit/Log Out
@@ -24,9 +24,9 @@ def menu():
     Please enter your choice: """)
 
     if choice == "1":
-        multi(path())
+        multi(data_process())
     elif choice == "2":
-        sim(path())
+        initial_sim(data_process())
     elif choice == "3":
         print("Processing Files")
         call("./process.sh")
@@ -40,19 +40,18 @@ def menu():
         print("Please try again")
         menu()
 
-def path():
+def data_process():
+
     filepathlist = []
+    sims = []
     for subdir, dirs, files in os.walk(r'Processed/'):
         files.sort()
+        dirs.sort()
+        sims.append(dirs)
         for filename in files:
             filepath = subdir + os.sep + filename
             filepathlist.append(filepath)
-    
-    return filepathlist
-
-    
-
-def multi(filepathlist):
+    sims = sims[0]
 
     #1: initial tolerance files
     filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
@@ -63,6 +62,55 @@ def multi(filepathlist):
     #3: number of iterations files
     filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
     
+    #Initialise dictionary for simulation files
+    #This was sim1_path
+    sim1_path = []
+    path_dict = {}
+
+    #Initialise data segments.
+    initial_path = []
+    final_path = []
+    niterations_path = []
+    '''!!!NEED TO CHANGE THIS INPUT METHOD!!!
+    sim_choice = input('Enter the simulation to graph: ')
+    #Seperate the simulations
+    for i in filepathlist:
+        if i.find(sim_choice) != -1:
+            sim1_path.append(i)
+    '''
+    
+    for i in sims:
+        for j in filepathlist:
+            if j.find(i) != -1:
+                path_dict.setdefault(i, []).append(j)
+
+    '''
+    #Split the simulation data into initial tolerance, final, n.o interations.
+    for i in sim1_path:
+        for x, y, z in zip(filenames_1, filenames_2, filenames_3):
+            if i.find(x) != -1:
+                initial_path.append(i)
+            elif i.find(y) != -1:
+                final_path.append(i)
+            elif i.find(z) != -1:
+                niterations_path.append(i)
+    '''
+    #Return the constructed dataframes
+    return path_dict
+
+def multi(path_dict):
+
+
+    
+    #1: initial tolerance files
+    filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
+
+    #2: final tolerance files
+    filenames_2 = ["pFinalRes_0", "pFinalRes_1", "UxFinalRes_0", "UyFinalRes_0", "UzFinalRes_0", "kFinalRes_0", "epsilonFinalRes_0"]
+
+    #3: number of iterations files
+    filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
+    '''
     #Initialise lists for simulation files
     sim1_path = []
 
@@ -71,11 +119,10 @@ def multi(filepathlist):
     final_path = []
     niterations_path = []
 
-    #Maybe take user input specifying which simulation you want to graph.
-
+    sim_choice = input('Enter the simulation to graph(i.e Simulation1): ')
     #Seperate the simulations
     for i in filepathlist:
-        if i.find("Simulation1") != -1:
+        if i.find(sim_choice) != -1:
             sim1_path.append(i)
 
     #Split the simulation data into initial tolerance, final, n.o interations.
@@ -114,8 +161,59 @@ def multi(filepathlist):
     for i in range(0, len(initial_tolerance_df)):
         percentage_combined.iloc[:, i] = ((initial_combined.iloc[:, i] - final_combined.iloc[:, i]) / initial_combined.iloc[:, i]) * 100
 
+
+    #Return the constructed dataframes
+    return initial_combined, final_combined, num_iterations_combined, relative_combined, percentage_combined
+    '''
+    #Choose the simulation to graph
+    sim_choice = input(path_dict.keys())
+
+    #Initialise data segments.
+    initial_path = []
+    final_path = []
+    niterations_path = []
+
+    #Split the chosen simulation data into initial tolerance, final, n.o interations.
+    for i in path_dict.get(sim_choice):
+        for x, y, z in zip(filenames_1, filenames_2, filenames_3):
+            if i.find(x) != -1:
+                initial_path.append(i)
+            elif i.find(y) != -1:
+                final_path.append(i)
+            elif i.find(z) != -1:
+                niterations_path.append(i)
+
+    #read and generate dataframe from txt files:
+    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in initial_path]
+    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in final_path]
+    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in niterations_path]
+
+    # Combine the dataframes
+    initial_combined = pd.concat(initial_tolerance_df, ignore_index=False, axis=1)
+    final_combined = pd.concat(final_tolerance_df, ignore_index=False, axis=1)
+    num_iterations_combined = pd.concat(num_iterations_df, ignore_index=False, axis=1)
+
+    #relative tolerance calculations
+    #!!!Change range to fit number of simulations!!!
+    relative_combined = pd.DataFrame(np.random.randint(1, 5, size=(min(len(initial_combined), len(final_combined)), 7)), columns=filenames_1)
+    relative_combined.index = np.arange(1,len(relative_combined)+1)
+
+    for i in range(0, len(initial_tolerance_df)):
+        relative_combined.iloc[:, i] = final_combined.iloc[:, i] / initial_combined.iloc[:, i]
+
+    #percentage change tolerance calculations
+    #!!!Change range to fit number of simulations!!!
+    percentage_combined = pd.DataFrame(np.random.randint(1, 5, size=(min(len(initial_combined), len(final_combined)), 7)), columns=filenames_1)
+    percentage_combined.index = np.arange(1,len(percentage_combined)+1)
+
+    for i in range(0, len(initial_tolerance_df)):
+        percentage_combined.iloc[:, i] = ((initial_combined.iloc[:, i] - final_combined.iloc[:, i]) / initial_combined.iloc[:, i]) * 100
+
     # define a figure, with subplots as an array "ax" 
     fig, ax = plt.subplots(2,2)
+
+    #Set figure Title
+    fig.suptitle(sim_choice)
 
 
     #Generate plots:
@@ -202,17 +300,28 @@ def multi(filepathlist):
     # display plot until closed
     plt.show()
 
-def sim(passed_list):
+def initial_sim(filepathlist):
+
+    #Need to take the x number of simulations and put up to 4 on a graph.
+    #This section is only meant to graph initial tolerance but could possibly graph relative etc.
+    #CREATE A COMPUTE FUNCTION.
+    #Read in Data.
+    #seperate dataframe for each sim.
+    #Compute relative percent etc.
+
+    """
+    #This will only the initial tolerance for each simulation
+
     #1: Simulation1 initial tolerance
     filenames_1 = ["Processed/Simulation1/logs/p_0", "Processed/Simulation1/logs/p_1", "Processed/Simulation1/logs/Ux_0", "Processed/Simulation1/logs/Uy_0", "Processed/Simulation1/logs/Uz_0", "Processed/Simulation1/logs/k_0", "Processed/Simulation1/logs/epsilon_0"]
 
-    #2: Simulation1 initial tolerance
+    #2: Simulation2 initial tolerance
     filenames_2 = ["Processed/Simulation2/logs/p_0", "Processed/Simulation2/logs/p_1", "Processed/Simulation2/logs/Ux_0", "Processed/Simulation2/logs/Uy_0", "Processed/Simulation2/logs/Uz_0", "Processed/Simulation2/logs/k_0", "Processed/Simulation2/logs/epsilon_0"]
 
-    #3: Simulation1 initial tolerance
+    #3: Simulation3 initial tolerance
     filenames_3 = ["Processed/Simulation3/logs/p_0", "Processed/Simulation3/logs/p_1", "Processed/Simulation3/logs/Ux_0", "Processed/Simulation3/logs/Uy_0", "Processed/Simulation3/logs/Uz_0", "Processed/Simulation3/logs/k_0", "Processed/Simulation3/logs/epsilon_0"]
 
-    #4: Simulation1 initial tolerance
+    #4: Simulation4 initial tolerance
     filenames_4 = ["Processed/Simulation4/logs/p_0", "Processed/Simulation4/logs/p_1", "Processed/Simulation4/logs/Ux_0", "Processed/Simulation4/logs/Uy_0", "Processed/Simulation4/logs/Uz_0", "Processed/Simulation4/logs/k_0", "Processed/Simulation4/logs/epsilon_0"]
 
 
@@ -360,6 +469,7 @@ def sim(passed_list):
 
     # display plot until closed
     plt.show()
+    """
 
 if __name__ == '__main__':
     menu()
