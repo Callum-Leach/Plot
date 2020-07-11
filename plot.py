@@ -71,37 +71,19 @@ def data_process():
     initial_path = []
     final_path = []
     niterations_path = []
-    '''!!!NEED TO CHANGE THIS INPUT METHOD!!!
-    sim_choice = input('Enter the simulation to graph: ')
-    #Seperate the simulations
-    for i in filepathlist:
-        if i.find(sim_choice) != -1:
-            sim1_path.append(i)
-    '''
     
     for i in sims:
         for j in filepathlist:
             if j.find(i) != -1:
                 path_dict.setdefault(i, []).append(j)
 
-    '''
-    #Split the simulation data into initial tolerance, final, n.o interations.
-    for i in sim1_path:
-        for x, y, z in zip(filenames_1, filenames_2, filenames_3):
-            if i.find(x) != -1:
-                initial_path.append(i)
-            elif i.find(y) != -1:
-                final_path.append(i)
-            elif i.find(z) != -1:
-                niterations_path.append(i)
-    '''
+    #!!!MAYBE JUST SPLIT ALL SIMS USING A NESTED DICT.
+
     #Return the constructed dataframes
     return path_dict
 
 def multi(path_dict):
 
-
-    
     #1: initial tolerance files
     filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
 
@@ -110,61 +92,7 @@ def multi(path_dict):
 
     #3: number of iterations files
     filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
-    '''
-    #Initialise lists for simulation files
-    sim1_path = []
-
-    #Initialise data segments.
-    initial_path = []
-    final_path = []
-    niterations_path = []
-
-    sim_choice = input('Enter the simulation to graph(i.e Simulation1): ')
-    #Seperate the simulations
-    for i in filepathlist:
-        if i.find(sim_choice) != -1:
-            sim1_path.append(i)
-
-    #Split the simulation data into initial tolerance, final, n.o interations.
-    for i in sim1_path:
-        for x, y, z in zip(filenames_1, filenames_2, filenames_3):
-            if i.find(x) != -1:
-                initial_path.append(i)
-            elif i.find(y) != -1:
-                final_path.append(i)
-            elif i.find(z) != -1:
-                niterations_path.append(i)
     
-    #read and generate dataframe from txt files:
-    initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in initial_path]
-    final_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in final_path]
-    num_iterations_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in niterations_path]
-
-    # Combine the dataframes
-    initial_combined = pd.concat(initial_tolerance_df, ignore_index=False, axis=1)
-    final_combined = pd.concat(final_tolerance_df, ignore_index=False, axis=1)
-    num_iterations_combined = pd.concat(num_iterations_df, ignore_index=False, axis=1)
-
-    #relative tolerance calculations
-    #!!!Change range to fit number of simulations!!!
-    relative_combined = pd.DataFrame(np.random.randint(1, 5, size=(min(len(initial_combined), len(final_combined)), 7)), columns=filenames_1)
-    relative_combined.index = np.arange(1,len(relative_combined)+1)
-
-    for i in range(0, len(initial_tolerance_df)):
-        relative_combined.iloc[:, i] = final_combined.iloc[:, i] / initial_combined.iloc[:, i]
-
-    #percentage change tolerance calculations
-    #!!!Change range to fit number of simulations!!!
-    percentage_combined = pd.DataFrame(np.random.randint(1, 5, size=(min(len(initial_combined), len(final_combined)), 7)), columns=filenames_1)
-    percentage_combined.index = np.arange(1,len(percentage_combined)+1)
-
-    for i in range(0, len(initial_tolerance_df)):
-        percentage_combined.iloc[:, i] = ((initial_combined.iloc[:, i] - final_combined.iloc[:, i]) / initial_combined.iloc[:, i]) * 100
-
-
-    #Return the constructed dataframes
-    return initial_combined, final_combined, num_iterations_combined, relative_combined, percentage_combined
-    '''
     #Choose the simulation to graph
     sim_choice = input(path_dict.keys())
 
@@ -214,7 +142,6 @@ def multi(path_dict):
 
     #Set figure Title
     fig.suptitle(sim_choice)
-
 
     #Generate plots:
     ax[0, 0].plot(initial_combined)
@@ -300,31 +227,25 @@ def multi(path_dict):
     # display plot until closed
     plt.show()
 
-def initial_sim(filepathlist):
+def initial_sim(path_dict):
 
-    #Need to take the x number of simulations and put up to 4 on a graph.
-    #This section is only meant to graph initial tolerance but could possibly graph relative etc.
-    #CREATE A COMPUTE FUNCTION.
-    #Read in Data.
-    #seperate dataframe for each sim.
-    #Compute relative percent etc.
+    #DOES THIS NEED TO BE DYNAMIC?
 
-    """
-    #This will only the initial tolerance for each simulation
+    #1: initial tolerance files
+    filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
+    initial_path = []
 
-    #1: Simulation1 initial tolerance
-    filenames_1 = ["Processed/Simulation1/logs/p_0", "Processed/Simulation1/logs/p_1", "Processed/Simulation1/logs/Ux_0", "Processed/Simulation1/logs/Uy_0", "Processed/Simulation1/logs/Uz_0", "Processed/Simulation1/logs/k_0", "Processed/Simulation1/logs/epsilon_0"]
+    #Split the chosen simulation data into initial tolerance, final, n.o interations.
+    for i in path_dict.keys():
+        for x in filenames_1:
+            #if path_dict.get(i).find(x) != -1:
+            #    initial_path.append(i)
+            print(path_dict[i])
 
-    #2: Simulation2 initial tolerance
-    filenames_2 = ["Processed/Simulation2/logs/p_0", "Processed/Simulation2/logs/p_1", "Processed/Simulation2/logs/Ux_0", "Processed/Simulation2/logs/Uy_0", "Processed/Simulation2/logs/Uz_0", "Processed/Simulation2/logs/k_0", "Processed/Simulation2/logs/epsilon_0"]
+    
 
-    #3: Simulation3 initial tolerance
-    filenames_3 = ["Processed/Simulation3/logs/p_0", "Processed/Simulation3/logs/p_1", "Processed/Simulation3/logs/Ux_0", "Processed/Simulation3/logs/Uy_0", "Processed/Simulation3/logs/Uz_0", "Processed/Simulation3/logs/k_0", "Processed/Simulation3/logs/epsilon_0"]
-
-    #4: Simulation4 initial tolerance
-    filenames_4 = ["Processed/Simulation4/logs/p_0", "Processed/Simulation4/logs/p_1", "Processed/Simulation4/logs/Ux_0", "Processed/Simulation4/logs/Uy_0", "Processed/Simulation4/logs/Uz_0", "Processed/Simulation4/logs/k_0", "Processed/Simulation4/logs/epsilon_0"]
-
-
+    '''
+    
     #read amnd generate dataframe from txt files:
     sim1_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_1]
     sim2_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_2]
@@ -469,7 +390,7 @@ def initial_sim(filepathlist):
 
     # display plot until closed
     plt.show()
-    """
+    '''
 
 if __name__ == '__main__':
     menu()
