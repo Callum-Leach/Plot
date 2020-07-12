@@ -233,24 +233,34 @@ def initial_sim(path_dict):
 
     #1: initial tolerance files
     filenames_1 = ["p_0", "p_1", "Ux_0", "Uy_0", "Uz_0", "k_0", "epsilon_0"]
-    initial_path = []
-
-    #Split the chosen simulation data into initial tolerance, final, n.o interations.
-    for i in path_dict.keys():
-        for x in filenames_1:
-            #if path_dict.get(i).find(x) != -1:
-            #    initial_path.append(i)
-            print(path_dict[i])
-
+    sim1 = []
+    sim2 = []
+    sim3 = []
+    sim4 = []
     
-
-    '''
+    for i in path_dict.get('Simulation1'):
+        result = any(elem in i for elem in filenames_1)
+        if result:
+            sim1.append(i)
+    for i in path_dict.get('Simulation2'):
+        result = any(elem in i for elem in filenames_1)
+        if result:
+            sim2.append(i)
+    for i in path_dict.get('Simulation3'):
+        result = any(elem in i for elem in filenames_1)
+        if result:
+            sim3.append(i)
+    for i in path_dict.get('Simulation4'):
+        result = any(elem in i for elem in filenames_1)
+        if result:
+            sim4.append(i)
+    
     
     #read amnd generate dataframe from txt files:
-    sim1_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_1]
-    sim2_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_2]
-    sim3_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_3]
-    sim4_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in filenames_4]
+    sim1_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in sim1]
+    sim2_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in sim2]
+    sim3_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in sim3]
+    sim4_initial_tolerance_df = [pd.read_csv(filename, names=[filename[5:]], sep="\t", engine='python') for filename in sim4]
 
     # Combine the dataframes
     sim1_initial_combined = pd.concat(sim1_initial_tolerance_df, ignore_index=False, axis=1)
@@ -260,7 +270,7 @@ def initial_sim(path_dict):
 
     # define a figure, with subplots as an array "ax" 
     fig, ax = plt.subplots(2,2)
-
+    fig.suptitle("Residual vs. Iteration")
 
     #Generate plots:
     ax[0, 0].plot(sim1_initial_combined)
@@ -273,16 +283,9 @@ def initial_sim(path_dict):
     # (optional) add horizontal lines to plot for idea of residuals relaxations.
     ax[0, 0].axhline(y=1.0e-05, color="black", linestyle='--')
     ax[0, 0].axhline(y=1.0e-04, color="black", linestyle='-')
-    # instantaiate array for legend names
-    legend_1 = []
-    # obtain legend names from file names
-    for string in filenames_1:
-        # desired name in legend
-        new_string = string.replace("Processed/Simulation1/logs/", "")
-        #add (to end) of legend
-        legend_1.append(new_string)
+    
     # title of plot
-    ax[0, 0].set_title("Residual vs. Iteration")
+    ax[0, 0].set_title("Simulation1")
     # x axis label
     ax[0, 0].set_xlabel("Iteration")
     # y axis label
@@ -294,23 +297,16 @@ def initial_sim(path_dict):
     ax[0, 0].set_xlim(1, len(sim1_initial_combined))
 
     # add legend to the plot
-    ax[0, 0].legend(legend_1)
+    ax[0, 0].legend(filenames_1)
 
     # plot 2 - (initial) residuals time series
 
     # (optional) add horizontal lines to plot for idea of residuals relaxations.
     ax[0, 1].axhline(y=1.0e-05, color="black", linestyle='--')
     ax[0, 1].axhline(y=1.0e-04, color="black", linestyle='-')
-    # instantaiate array for legend names
-    legend_1 = []
-    # obtain legend names from file names
-    for string in filenames_2:
-        # desired name in legend
-        new_string = string.replace("Processed/Simulation2/logs/", "")
-        #add (to end) of legend
-        legend_1.append(new_string)
+    
     # title of plot
-    ax[0, 1].set_title("Residual vs. Iteration")
+    ax[0, 1].set_title("Simulation2")
     # x axis label
     ax[0, 1].set_xlabel("Iteration")
     # y axis label
@@ -322,23 +318,16 @@ def initial_sim(path_dict):
     ax[0, 1].set_xlim(1, len(sim2_initial_combined))
 
     # add legend to the plot
-    ax[0, 1].legend(legend_1)
+    ax[0, 1].legend(filenames_1)
 
     # plot 3 - (initial) residuals time series
 
     # (optional) add horizontal lines to plot for idea of residuals relaxations.
     ax[1, 0].axhline(y=1.0e-05, color="black", linestyle='--')
     ax[1, 0].axhline(y=1.0e-04, color="black", linestyle='-')
-    # instantaiate array for legend names
-    legend_1 = []
-    # obtain legend names from file names
-    for string in filenames_3:
-        # desired name in legend
-        new_string = string.replace("Processed/Simulation3/logs/", "")
-        #add (to end) of legend
-        legend_1.append(new_string)
+    
     # title of plot
-    ax[1, 0].set_title("Residual vs. Iteration")
+    ax[1, 0].set_title("Simulation3")
     # x axis label
     ax[1, 0].set_xlabel("Iteration")
     # y axis label
@@ -350,7 +339,7 @@ def initial_sim(path_dict):
     ax[1, 0].set_xlim(1, len(sim3_initial_combined))
 
     # add legend to the plot
-    ax[1, 0].legend(legend_1)
+    ax[1, 0].legend(filenames_1)
 
 
 
@@ -359,16 +348,9 @@ def initial_sim(path_dict):
     # (optional) add horizontal lines to plot for idea of residuals relaxations.
     ax[1, 1].axhline(y=1.0e-05, color="black", linestyle='--')
     ax[1, 1].axhline(y=1.0e-04, color="black", linestyle='-')
-    # instantaiate array for legend names
-    legend_1 = []
-    # obtain legend names from file names
-    for string in filenames_4:
-        # desired name in legend
-        new_string = string.replace("Processed/Simulation4/logs/", "")
-        #add (to end) of legend
-        legend_1.append(new_string)
+    
     # title of plot
-    ax[1, 1].set_title("Residual vs. Iteration")
+    ax[1, 1].set_title("Simulation4")
     # x axis label
     ax[1, 1].set_xlabel("Iteration")
     # y axis label
@@ -380,7 +362,7 @@ def initial_sim(path_dict):
     ax[1, 1].set_xlim(1, len(sim4_initial_combined))
 
     # add legend to the plot
-    ax[1, 1].legend(legend_1)
+    ax[1, 1].legend(filenames_1)
 
 
 
@@ -390,7 +372,7 @@ def initial_sim(path_dict):
 
     # display plot until closed
     plt.show()
-    '''
+    
 
 if __name__ == '__main__':
     menu()
