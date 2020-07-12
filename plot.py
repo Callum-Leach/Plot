@@ -63,21 +63,13 @@ def data_process():
     filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
     
     #Initialise dictionary for simulation files
-    #This was sim1_path
-    sim1_path = []
     path_dict = {}
 
-    #Initialise data segments.
-    initial_path = []
-    final_path = []
-    niterations_path = []
     
     for i in sims:
         for j in filepathlist:
             if j.find(i) != -1:
                 path_dict.setdefault(i, []).append(j)
-
-    #!!!MAYBE JUST SPLIT ALL SIMS USING A NESTED DICT.
 
     #Return the constructed dataframes
     return path_dict
@@ -94,7 +86,7 @@ def multi(path_dict):
     filenames_3 = ["pIters_0", "pIters_1", "UxIters_0", "UyIters_0", "UzIters_0", "kIters_0", "epsilonIters_0"]
     
     #Choose the simulation to graph
-    sim_choice = input(path_dict.keys())
+    sim_choice = input("Enter the simulation to graph, i.e 'Simulation1' : ")
 
     #Initialise data segments.
     initial_path = []
